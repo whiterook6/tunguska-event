@@ -31,25 +31,25 @@
 						<div class="panel-heading">
 							<h3 class="panel-title">Input</h3>
 						</div>
-						<form class="panel-body" id-"form_input">
+						<form class="panel-body" id="form_input">
 							<div class="form-group">
-								<label for="starting_position">Starting Position <small>Example: -37.1336 N, 109.3768 W</small></label>
-								<input type="text" id="starting_position" class="form-control"/>
+								<label for="starting_position" class="control-label">Starting Position <small>Example: -37.1336 N, 109.3768 W</small></label>
+								<input type="text" id="starting_position" class="form-control" value="-37W"/>
 							</div>
 							<div class="form-group">
-								<label for="starting_asl">Starting Altitude Above Sea Level <small>Example: 213m</small></label>
-								<input type="text" id="starting_asl" class="form-control"/>
+								<label for="starting_asl" class="control-label">Starting Altitude Above Sea Level <small>Example: 213m</small></label>
+								<input type="text" id="starting_asl" class="form-control" value="0m"/>
 							</div>							
 							<div class="form-group">
-								<label for="target_position">Target Position <small>Example: -37.1336 N, 109.3768 W</small></label>
-								<input type="text" id="target_position" class="form-control"/>
+								<label for="target_position" class="control-label">Target Position <small>Example: -37.1336 N, 109.3768 W</small></label>
+								<input type="text" id="target_position" class="form-control" value="-37.1336 N, 109.3768 W"/>
 							</div>
 							<div class="form-group">
-								<label for="target_asl">Target Altitude Above Sea Level <small>Example: 213m</small></label>
-								<input type="text" id="target_asl" class="form-control"/>
+								<label for="target_asl" class="control-label">Target Altitude Above Sea Level <small>Example: 213m</small></label>
+								<input type="text" id="target_asl" class="form-control" value="0m"/>
 							</div>
 							<div class="form-group">
-								<label for="body_select">Body</label>
+								<label for="body_select" class="control-label">Body</label>
 								<select class="form-control" id="body_select">
 									<optgroup label="Stock System">
 										<option value="Bop">Bop</option>
@@ -77,9 +77,7 @@
 							</div>
 
 							<div class="progress" style="margin-top:15px;margin-bottom:0">
-								<div class="progress-bar progress-bar-success progress-bar-striped active" id="progress_bar" style="width: 35%">
-									
-								</div>
+								<div class="progress-bar progress-bar-success progress-bar-striped active" id="progress_bar" style="width: 35%"></div>
 							</div>
 						</form>
 					</div>
@@ -91,15 +89,15 @@
 						</div>
 						<form class="panel-body">
 							<div class="form-group">
-								<label for="starting_position">Heading (degrees)</label>
+								<label for="starting_position" class="control-label">Heading (degrees)</label>
 								<input type="text" id="heading_output" class="form-control" disabled value="47&deg; east from North" />
 							</div>
 							<div class="form-group">
-								<label for="target_position">Pitch (degrees)</label>
+								<label for="target_position" class="control-label">Pitch (degrees)</label>
 								<input type="text" id="pitch_output" class="form-control" disabled value="37&deg; above the horizon" />
 							</div>
 							<div class="form-group">
-								<label for="target_position">Delta-V Required</label>
+								<label for="target_position" class="control-label">Delta-V Required</label>
 								<input type="text" id="deltav_output" class="form-control" disabled value="1.56km/s" />
 							</div>
 						</form>
@@ -111,196 +109,6 @@
 		<script src="./node_modules/jquery/dist/jquery.min.js"></script>
 		<script src="./node_modules/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
 		<script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script>
-$(function() {
-	var form = $('#form_input');
-
-	var progress_bar = $('#progress_bar');
-
-	var geo_mask = "S0D.0DDD N, S0DD.0DDD W";
-	var pattern = {
-		translation: {
-			'S': { // sign
-				pattern: /\-?/
-			},
-			'D': { // optional digit
-				pattern: /\d/,
-				optional: true
-			}
-		}
-	}
-
-	// Converts from degrees to radians.
-	Math.radians = function(degrees) {
-		return degrees * Math.PI / 180;
-	};
-	 
-	// Converts from radians to degrees.
-	Math.degrees = function(radians) {
-		return radians * 180 / Math.PI;
-	};
-
-	var source_position_input = $('#starting_position');
-	source_position_input.mask(geo_mask, pattern);
-	
-	var source_asl = $('#starting_asl');
-	source_asl.mask('0DDDm', pattern);
-
-	var target_position_input = $('#target_position');
-	target_position_input.mask(geo_mask, pattern);
-
-	var target_asl = $('#starting_asl');
-	target_asl.mask('0DDDm', pattern);
-
-	var preset_input = $('#body_select');
-
-	var heading_output = $('#heading_output');
-	var pitch_output = $('#pitch_output');
-	var deltav_output = $('#deltav_output');
-
-	var presets = {
-		// {GM: Universal gravity in m3/s2, R: radius in m}
-		bop:    {GM: 2.49e9,  R: 6.5e4},
-		dres:   {GM: 2.15e10, R: 1.38e5},
-		duna:   {GM: 3.01e11, R: 3.2e5},
-		eeloo:  {GM: 7.44e10, R: 2.1e5},
-		eve:    {GM: 8.17e12, R: 7e5},
-		gilly:  {GM: 8.29e6,  R: 1.3e4},
-		ike:    {GM: 1.85e10, R: 1.3e5},
-		jool:   {GM: 2.83e14, R: 6e6},
-		kerbin: {GM: 3.53e12, R: 6e5},
-		laythe: {GM: 1.96e12, R: 5e5},
-		minmus: {GM: 1.76e9,  R: 6e4},
-		moho:   {GM: 1.68e11, R: 2.5e5},
-		mun:    {GM: 6.51e10, R: 2e5},
-		pol:    {GM: 7.22e8,  R: 4.4e4},
-		tylo:   {GM: 2.83e12, R: 6e5},
-		vall:   {GM: 2.07e11, R: 3e5},
-	}
-
-	function calculate(start, end){
-		var body = presets.gilly;
-
-		function calculate_bearing(lat_1, lon_1, lat_2, lon_2){
-			return Math.atan2(
-				Math.cos(lat_1)*Math.sin(lat_2) - Math.sin(lat_1)*Math.cos(lat_2)*Math.cos(lon_2 - lon_1),
-				Math.sin(lon_2 - lon_1)*Math.cos(lat_2)
-			);
-		}
-
-		function calculate_theta(lat_1, lon_1, lat_2, lon_2){
-			return Math.acos(
-				Math.cos(lat_1)*Math.cos(lon_1)*Math.cos(lat_2)*Math.cos(lon_2)
-					+ Math.cos(lat_1)*Math.sin(lon_1)*Math.cos(lat_2)*Math.sin(lon_2)
-					+ Math.sin(lat_1)*Math.sin(lat_2)
-			);
-		}
-
-		function get_vector_mr(mag, radians){
-			return {
-				x: mag * Math.cos(radians),
-				y: mag * Math.sin(radians),
-				mag: mag
-			};
-		}
-
-		function get_vector_xy(x, y){
-			return {
-				x: x,
-				y: y,
-				mag: Math.sqrt(x*x + y*y)
-			};
-		}
-
-		function log_vector(label, vector){
-			console.log(" "+label+":  [ x:"+vector.x.toFixed(2)+"m, y:"+vector.y.toFixed(2)+"m]");
-			console.log("|"+label+"|: "+vector.mag.toFixed(2)+"m");
-		}
-
-		function log_orbit(label, orbit){
-			console.log(label+": a:"+orbit.a.toFixed(2) +"m, c:"+orbit.c.toFixed(2) +"m, e:"+orbit.e.toFixed(2) +", ap:"+orbit.ap.toFixed(2)+"m");
-			console.log(label+" period: "+orbit.t+"s");
-		}
-		
-		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
-		console.log("Heading: "+heading.toFixed(4)+"d");
-		set_heading(heading);
-		
-		var theta = calculate_theta(start.lat, start.lon, end.lat, end.lon);
-		console.log("Theta: "+theta.toFixed(4)+"r");
-
-		var min_mag = Math.min(start.asl + body.R, end.asl + body.R);
-		var Ra = get_vector_mr(min_mag, theta);
-		log_vector('Ra', Ra);
-
-		var max_mag = Math.max(start.asl + body.R, end.asl + body.R);
-		//var Rb = get_vector_mr(max_mag, theta);
-		var Rb = get_vector_xy(200000, 0); // Note: This is hard coded in the excel sheet for some reason.
-		log_vector('Rb', Rb);
-
-		var Rc = get_vector_xy(Rb.x - Ra.x, Rb.y - Ra.y);
-		log_vector('Rc', Rc);
-
-		var Rf = get_vector_xy(
-			Rb.x - 0.5*(Rc.x/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag), // x
-			Rb.y - 0.5*(Rc.y/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag) // y
-		);
-		log_vector('Rf', Rf);
-
-		var orbit = {
-			a:  0.5 * (Rb.mag + 0.5*(Rc.mag - Rb.mag + Ra.mag)),
-			c:  Rf.mag / 2
-		}
-		orbit.e = orbit.c / orbit.a;
-		orbit.ap = orbit.a * (1 + orbit.e);
-		orbit.t = 6.28318 * Math.sqrt(orbit.a*orbit.a*orbit.a / body.GM);
-		log_orbit('Optimal Orbit', orbit);
-
-
-	}
-
-	function set_error(which, is_error){ // which = jquery element, is_error = true/false
-		if (is_error){
-			which.addClass('has-error').removeClass('has-success');
-		} else {
-			which.addClass('has-success').removeClass('has-error');
-		}
-	}
-
-	function set_progress(complete){
-		progress_bar.width(complete);
-	}
-
-	function set_heading(heading){
-		while (heading < 0){
-			heading += 360;
-		}
-		heading_output.val(heading.toFixed(1) + "° east from North");
-	}
-
-	function set_pitch(pitch){
-		pitch_output.val(pitch.toFixed(1) + "° above the horizon");
-	}
-
-	// testing
-	set_error(target_position_input, true);
-	set_progress('57%');
-
-	var start = {
-		lat: Math.radians(0),
-		lon: Math.radians(0),
-		asl: 0,
-	};
-
-	var end = {
-		lat: Math.radians(0),
-		lon: Math.radians(89),
-		asl: 0,
-	};
-
-	calculate(start, end);
-	set_pitch(47);
-});
-		</script>
+		<script src="./script.js"></script>
 	</body>
 </html>
