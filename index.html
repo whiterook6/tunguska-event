@@ -173,7 +173,7 @@ $(function() {
 		laythe: {},
 		minmus: {},
 		moho: {},
-		mun: {G: 6.51e10, R: 2e4},
+		mun: {G: 6.51e10, R: 2e5},
 		pol: {},
 		tylo: {},
 		vall: {},
@@ -189,12 +189,74 @@ $(function() {
 			);
 		}
 
-		var lat_1 = Math.radians(50.0);
-		var lon_1 = Math.radians(-123.45);
+		function calculate_theta(lat_1, lon_1, lat_2, lon_2){
+			return Math.acos(
+				Math.cos(lat_1)*Math.cos(lon_1)*Math.cos(lat_2)*Math.cos(lon_2)
+					+ Math.cos(lat_1)*Math.sin(lon_1)*Math.cos(lat_2)*Math.sin(lon_2)
+					+ Math.sin(lat_1)*Math.sin(lat_2)
+			);
+		}
 
-		var lat_2 = Math.radians(70.0);
-		var lon_2 = Math.radians(-43.45);
-		set_heading(Math.degrees(calculate_bearing(lat_1, lon_1, lat_2, lon_2)));
+		var start = {
+			lat: Math.radians(0),
+			lon: Math.radians(0),
+			asl: 0,
+		};
+
+		var end = {
+			lat: Math.radians(0),
+			lon: Math.radians(89),
+			asl: 0,
+		};
+
+		function get_vector_mr(mag, radians){
+			return {
+				x: mag * Math.cos(radians),
+				y: mag * Math.sin(radians),
+				mag: mag
+			};
+		}
+
+		function get_vector_xy(x, y){
+			return {
+				x: x,
+				y: y,
+				mag: Math.sqrt(x*x + y*y)
+			};
+		}
+
+		function log_vector(label, vector){
+			console.log(" "+label+":  [ x:"+vector.x.toFixed(2)+"m, y:"+vector.y.toFixed(2)+"m]");
+			console.log("|"+label+"|: "+vector.mag.toFixed(2)+"m");
+		}
+
+		
+		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
+		console.log("Heading: "+heading.toFixed(4)+"d");
+		set_heading(heading);
+		
+		var theta = calculate_theta(start.lat, start.lon, end.lat, end.lon);
+		console.log("Theta: "+theta.toFixed(4)+"r");
+
+		var min_mag = Math.min(start.asl + body.R, end.asl + body.R);
+		var Ra = get_vector_mr(min_mag, theta);
+		log_vector('Ra', Ra);
+
+		var max_mag = Math.max(start.asl + body.R, end.asl + body.R);
+		//var Rb = get_vector_mr(max_mag, theta);
+		var Rb = get_vector_xy(200000, 0); // Note: This is hard coded in the excel sheet for some reason.
+		log_vector('Rb', Rb);
+
+		var Rc = get_vector_xy(Rb.x - Ra.x, Rb.y - Ra.y);
+		log_vector('Rc', Rc);
+
+		var Rf = get_vector_xy(
+			Rb.x - 0.5*(Rc.x/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag), // x
+			Rb.y - 0.5*(Rc.y/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag) // y
+		);
+		log_vector('Rf', Rf);
+
+
 	}
 
 	function set_error(which, is_error){ // which = jquery element, is_error = true/false
@@ -210,6 +272,9 @@ $(function() {
 	}
 
 	function set_heading(heading){
+		while (heading < 0){
+			heading += 360;
+		}
 		heading_output.val(heading.toFixed(1) + "° east from North");
 	}
 
