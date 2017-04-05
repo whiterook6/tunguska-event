@@ -14,6 +14,7 @@
   "homepage": "https://github.com/whiterook6/tunguska-event#readme",
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1",
+    "jquery-mask-plugin": "^1.14.10"
   }
 }

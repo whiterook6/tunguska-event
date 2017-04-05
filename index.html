@@ -33,12 +33,44 @@
 						</div>
 						<form class="panel-body" id-"form_input">
 							<div class="form-group">
-								<label for="starting_position">Starting Position</label>
+								<label for="starting_position">Starting Position <small>Example: -37.1336 N, 109.3768 W</small></label>
 								<input type="text" id="starting_position" class="form-control"/>
 							</div>
 							<div class="form-group">
-								<label for="target_position">Target Position</label>
+								<label for="starting_asl">Starting Altitude Above Sea Level<small>Example: 213m ASL</small></label>
+								<input type="text" id="starting_asl" class="form-control"/>
+							</div>							
+							<div class="form-group">
+								<label for="target_position">Target Position <small>Example: -37.1336 N, 109.3768 W</small></label>
 								<input type="text" id="target_position" class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label for="target_asl">Target Altitude Above Sea Level<small>Example: 213m ASL</small></label>
+								<input type="text" id="target_asl" class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label for="body_select">Body</label>
+								<select class="form-control" id="body_select">
+									<optgroup label="Stock System">
+										<option value="Bop">Bop</option>
+										<option value="Dres">Dres</option>
+										<option value="Duna">Duna</option>
+										<option value="Eeloo">Eeloo</option>
+										<option value="Eve">Eve</option>
+										<option value="Gilly">Gilly</option>
+										<option value="Ike">Ike</option>
+										<option value="Jool">Jool</option>
+										<option value="Kerbin">Kerbin</option>
+										<option value="Kerbol">Kerbol</option>
+										<option value="Laythe">Laythe</option>
+										<option value="Minmus">Minmus</option>
+										<option value="Moho">Moho</option>
+										<option value="Mun">Mun</option>
+										<option value="Pol">Pol</option>
+										<option value="Tylo">Tylo</option>
+										<option value="Vall">Vall</option>
+ 									</optgroup>
+								</select>
 							</div>
 							<div class="btn-group">
 								<button type="button" class="btn btn-default">Reset</button>
@@ -78,18 +110,72 @@
 		</div>
 
 		<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="./node_modules/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
 		<script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script>
 $(function() {
 	var form = $('#form_input');
 
 	var progress_bar = $('#progress_bar');
+
+	var geo_mask = "S0D.0DDD N, S0DD.0DDD W";
+	var pattern = {
+		translation: {
+			'S': { // sign
+				pattern: /\-?/
+			},
+			'D': { // optional digit
+				pattern: /\d/,
+				optional: true
+			}
+		}
+	}
 	var source_position_input = $('#starting_position');
+	source_position_input.mask(geo_mask, pattern);
+	
+	var source_asl = $('#starting_asl');
+	source_asl.mask('0DDDm', pattern);
+
 	var target_position_input = $('#target_position');
+	target_position_input.mask(geo_mask, pattern);
+
+	var target_asl = $('#starting_asl');
+	target_asl.mask('0DDDm', pattern);
+
+	var preset_input = $('#body_select');
 
 	var heading_output = $('#heading_output');
 	var pitch_output = $('#pitch_output');
 	var deltav_output = $('#deltav_output');
+
+	var presets = {
+		bop: {},
+		dres: {},
+		duna: {},
+		eeloo: {},
+		eve: {},
+		gilly: {},
+		ike: {},
+		jool: {},
+		kerbin: {},
+		kerbol: {},
+		laythe: {},
+		minmus: {},
+		moho: {},
+		mun: {},
+		pol: {},
+		tylo: {},
+		vall: {},
+	}
+
+	function get_parameters(){
+		return preset_input.val();
+	}
+
+	function get_start_pos(){
+		var value = source_position_input.val();
+
+	}
 
 	function set_error(is_error){
 		if (is_error){
