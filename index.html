@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<title>Tunguska Event</title>
+
+		<!-- Bootstrap -->
+		<link href="./node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h1>Navigator <small>A suborbital hop calculator</small></h1>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">Input</h3>
+						</div>
+						<form class="panel-body" id-"form_input">
+							<div class="form-group">
+								<label for="starting_position">Starting Position</label>
+								<input type="text" id="starting_position" class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label for="target_position">Target Position</label>
+								<input type="text" id="target_position" class="form-control"/>
+							</div>
+							<div class="btn-group">
+								<button type="button" class="btn btn-default">Reset</button>
+								<button type="button" class="btn btn-success">Calculate</button>
+							</div>
+
+							<div class="progress" style="margin-top:15px;margin-bottom:0">
+								<div class="progress-bar progress-bar-success progress-bar-striped active" id="progress_bar" style="width: 35%">
+									
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">Trajectory</h3>
+						</div>
+						<form class="panel-body">
+							<div class="form-group">
+								<label for="starting_position">Heading (degrees)</label>
+								<input type="text" id="heading_output" class="form-control" disabled value="47&deg; east from North" />
+							</div>
+							<div class="form-group">
+								<label for="target_position">Pitch (degrees)</label>
+								<input type="text" id="pitch_output" class="form-control" disabled value="37&deg; above the horizon" />
+							</div>
+							<div class="form-group">
+								<label for="target_position">Delta-V Required</label>
+								<input type="text" id="deltav_output" class="form-control" disabled value="1.56km/s" />
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script>
+$(function() {
+	var form = $('#form_input');
+
+	var progress_bar = $('#progress_bar');
+	var source_position_input = $('#starting_position');
+	var target_position_input = $('#target_position');
+
+	var heading_output = $('#heading_output');
+	var pitch_output = $('#pitch_output');
+	var deltav_output = $('#deltav_output');
+
+	function set_error(is_error){
+		if (is_error){
+			form.addClass('has-error').removeClass('has-success');
+		} else {
+			form.addClass('has-success').removeClass('has-error');
+		}
+	}
+
+	function set_progress(complete){
+		progress_bar.width(complete);
+	}
+
+	function set_heading(heading){
+		heading_output.val(heading + "° east from North");
+	}
+
+	function set_pitch(pitch){
+		pitch_output.val(pitch + "° above the horizon");
+	}
+
+	// testing
+	set_error(true);
+	set_progress('57%');
+	set_heading(123);
+	set_pitch(47);
+});
+		</script>
+	</body>
+</html>

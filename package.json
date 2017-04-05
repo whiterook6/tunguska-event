@@ -1,0 +1,19 @@
+{
+  "name": "tunguska-event",
+  "version": "1.0.0",
+  "description": "A small webapp for calculating heading and velocity to hop from place to place in KSP",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whiterook6/tunguska-event.git"
+  },
+  "author": "whiterook6",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whiterook6/tunguska-event/issues"
+  },
+  "homepage": "https://github.com/whiterook6/tunguska-event#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1"
+  }
+}
