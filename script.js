@@ -1,44 +1,27 @@
+// https://docs.google.com/spreadsheets/d/1JIUHIAujZuQdvPRIo-FTho82QcEqVLeuRe-lLiM_b-I/edit
+
+// Converts from degrees to radians.
+Math.radians = function(degrees) {
+	return degrees * Math.PI / 180;
+};
+ 
+// Converts from radians to degrees.
+Math.degrees = function(radians) {
+	return radians * 180 / Math.PI;
+};
+
 $(function() {
 	var form = $('#form_input');
 
-	var progress_bar = $('#progress_bar');
-
-	var geo_mask = "S0D.0000 N, S0DD.0000 W";
-	var pattern = {
-		translation: {
-			'S': { // sign
-				pattern: /\-?/
-			},
-			'D': { // optional digit
-				pattern: /\d/,
-				optional: true
-			}
-		}
-	};
-
-	// Converts from degrees to radians.
-	Math.radians = function(degrees) {
-		return degrees * Math.PI / 180;
-	};
-	 
-	// Converts from radians to degrees.
-	Math.degrees = function(radians) {
-		return radians * 180 / Math.PI;
-	};
-
 	var source_position_input = $('#starting_position');
-	source_position_input.mask(geo_mask, pattern);
-	
 	var source_asl = $('#starting_asl');
-	source_asl.mask('0DDDm', pattern);
-
 	var target_position_input = $('#target_position');
-	target_position_input.mask(geo_mask, pattern);
-
 	var target_asl = $('#starting_asl');
-	target_asl.mask('0DDDm', pattern);
-
 	var preset_input = $('#body_select');
+	
+	var submit_button = $('#submit');
+	var reset_button = $('#reset');
+	var progress_bar = $('#progress_bar');
 
 	var heading_output = $('#heading_output');
 	var pitch_output = $('#pitch_output');
@@ -64,9 +47,9 @@ $(function() {
 		vall:   {GM: 2.07e11, R: 3e5,    t: 0},
 	};
 
-	var geo_regex = /(\-?\d+\.\d+) N, (\-?\d+\.\d+) W/;
 
 	function get_coordinates(input){
+		var geo_regex = /(\-?\d+\.\d+) N, (\-?\d+\.\d+) W/;
 		var start = input.val();
 		var match = geo_regex.exec(start);
 
@@ -85,7 +68,13 @@ $(function() {
 		};
 	}
 
-	function calculate(start, end, body){
+	function calculate_heading(start, end, body){
+		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
+		console.log("Heading: "+heading.toFixed(4)+"d");
+		return heading;
+	}
+
+	function calculate_optimal_orbit(start, end, body){
 		function calculate_bearing(lat_1, lon_1, lat_2, lon_2){
 			return Math.atan2(
 				Math.cos(lat_1)*Math.sin(lat_2) - Math.sin(lat_1)*Math.cos(lat_2)*Math.cos(lon_2 - lon_1),
@@ -127,10 +116,6 @@ $(function() {
 			console.log(label+" period: "+orbit.t+"s");
 		}
 		
-		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
-		console.log("Heading: "+heading.toFixed(4)+"d");
-		set_heading(heading);
-		
 		var theta = calculate_theta(start.lat, start.lon, end.lat, end.lon);
 		console.log("Theta: "+theta.toFixed(4)+"r");
 
@@ -139,8 +124,7 @@ $(function() {
 		log_vector('Ra', Ra);
 
 		var max_mag = Math.max(start.asl + body.R, end.asl + body.R);
-		//var Rb = get_vector_mr(max_mag, theta);
-		var Rb = get_vector_xy(200000, 0); // Note: This is hard coded in the excel sheet for some reason.
+		var Rb = get_vector_xy(max_mag, 0); // manually set to find the x-origin or some shit
 		log_vector('Rb', Rb);
 
 		var Rc = get_vector_xy(Rb.x - Ra.x, Rb.y - Ra.y);
@@ -154,13 +138,74 @@ $(function() {
 
 		var orbit = {
 			a:  0.5 * (Rb.mag + 0.5*(Rc.mag - Rb.mag + Ra.mag)),
-			c:  Rf.mag / 2
+			c:  Rf.mag / 2,
+			Ra: Ra,
+			Rb: Rb,
+			Rc: Rc,
+			Rf: Rf,
+			theta: theta,
 		};
 
 		orbit.e = orbit.c / orbit.a;
 		orbit.ap = orbit.a * (1 + orbit.e);
 		orbit.t = 6.28318 * Math.sqrt(orbit.a*orbit.a*orbit.a / body.GM);
 		log_orbit('Optimal Orbit', orbit);
+
+		return orbit;
+	}
+
+	function calculate_deltav(orbit, start, end, body){
+		//=sqrt(H3 * (2/C4 - 1/C19))
+		var altitude_1 = start.asl + body.R;
+		var v1 = Math.sqrt(body.GM * ((2/altitude_1) - (1/orbit.a)));
+
+		var altitude_2 = end.asl + body.R;
+		var v2 = Math.sqrt(body.GM * ((2/altitude_2) - (1/orbit.a)));
+
+		return v1 + v1;
+	}
+
+	function calculate_true_anomaly(orbit, start, end){
+		if (start.asl > end.asl){
+			return 3.14159 - Math.acos(
+				(orbit.Rf.x*orbit.Rb.x + orbit.Rf.y*orbit.Rb.y) / (orbit.Rf.mag*orbit.Rb.mag)
+			);
+		} else {
+			return 3.14159 - Math.acos(
+				(orbit.Rf.x*orbit.Ra.x + orbit.Rf.y*orbit.Ra.y) / (orbit.Rf.mag*orbit.Ra.mag)
+			);
+		}
+	}
+
+	function calculate_body_rotation(body, t){ // returns in degrees to add to target longitude
+		return (t / body.t) * 360;
+	}
+
+	function run_calculations(){
+		var heading;
+		var pitch;
+		var deltav;
+
+		var start = get_coordinates(source_position_input);
+		start.asl = parseFloat(source_asl.val());
+
+		var end = get_coordinates(target_position_input);
+		end.asl = parseFloat(target_asl.val());
+
+		var body = preset[preset_input.val()];
+		var orbit = calculate_optimal_orbit(start, end, body);
+
+		var deltav = calculate_deltav(orbit, start, end, body);
+
+		for (var i = 0; i < 5; i++) {
+			var rotation = calculate_body_rotation(body, time_of_trajectory);
+			new_end = {
+				lat: end.lat,
+				lon: end.lon + rotation
+			}
+
+			orbit = calculate_optimal_orbit(start, new_end);
+		};
 	}
 
 	function set_error(which, is_error){ // which = jquery element, is_error = true/false
@@ -191,12 +236,11 @@ $(function() {
 	set_progress('57%');
 
 	var body = presets.gilly;
-	var start = get_coordinates(source_position_input);
-	start.asl = 0;
+	
 
 	var end = get_coordinates(target_position_input);
 	end.asl = 0;
 
-	calculate(start, end, body);
+	run_calculations(start, end, body);
 	set_pitch(47);
 });
