@@ -230,6 +230,9 @@ $(function() {
 			console.log("|"+label+"|: "+vector.mag.toFixed(2)+"m");
 		}
 
+		function log_orbit(label, orbit){
+			console.log(label+": a:"+orbit.a.toFixed(2) +"m, c:"+orbit.c.toFixed(2) +"m, e:"+orbit.e.toFixed(2) +", ap:"+orbit.ap.toFixed(2)+"m");
+		}
 		
 		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
 		console.log("Heading: "+heading.toFixed(4)+"d");
@@ -256,7 +259,13 @@ $(function() {
 		);
 		log_vector('Rf', Rf);
 
-
+		var orbit = {
+			a:  0.5 * (Rb.mag + 0.5*(Rc.mag - Rb.mag + Ra.mag)),
+			c:  Rf.mag / 2
+		}
+		orbit.e = orbit.c / orbit.a;
+		orbit.ap = orbit.a * (1 + orbit.e);
+		log_orbit('Optimal Orbit', orbit);
 	}
 
 	function set_error(which, is_error){ // which = jquery element, is_error = true/false
