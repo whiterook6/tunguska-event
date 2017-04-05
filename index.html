@@ -159,27 +159,27 @@ $(function() {
 	var deltav_output = $('#deltav_output');
 
 	var presets = {
-		// {G: Universal gravity, R: radius in m}
-		bop: {G: 1e10, R: 6.5e4},
-		dres: {G: 1e10, R: 1.38e5},
-		duna: {G: 1e10, R: 3.2e5},
-		eeloo: {G: 1e10, R: 2.1e5},
-		eve: {G: 1e10, R: 7e5},
-		gilly: {G: 1e10, R: 1.3e4},
-		ike: {G: 1e10, R: 1.3e5},
-		jool: {G: 1e10, R: 6e6},
-		kerbin: {G: 1e10, R: 6e5},
-		laythe: {G: 1e10, R: 5e5},
-		minmus: {G: 1e10, R: 6e4},
-		moho: {G: 1e10, R: 2.5e5},
-		mun: {G: 6.51e10, R: 2e5},
-		pol: {G: 1e10, R: 4.4e4},
-		tylo: {G: 1e10, R: 6e5},
-		vall: {G: 1e10, R: 3e5},
+		// {GM: Universal gravity in m3/s2, R: radius in m}
+		bop:    {GM: 2.49e9,  R: 6.5e4},
+		dres:   {GM: 2.15e10, R: 1.38e5},
+		duna:   {GM: 3.01e11, R: 3.2e5},
+		eeloo:  {GM: 7.44e10, R: 2.1e5},
+		eve:    {GM: 8.17e12, R: 7e5},
+		gilly:  {GM: 8.29e6,  R: 1.3e4},
+		ike:    {GM: 1.85e10, R: 1.3e5},
+		jool:   {GM: 2.83e14, R: 6e6},
+		kerbin: {GM: 3.53e12, R: 6e5},
+		laythe: {GM: 1.96e12, R: 5e5},
+		minmus: {GM: 1.76e9,  R: 6e4},
+		moho:   {GM: 1.68e11, R: 2.5e5},
+		mun:    {GM: 6.51e10, R: 2e5},
+		pol:    {GM: 7.22e8,  R: 4.4e4},
+		tylo:   {GM: 2.83e12, R: 6e5},
+		vall:   {GM: 2.07e11, R: 3e5},
 	}
 
-	function calculate(){
-		var body = presets.mun;
+	function calculate(start, end){
+		var body = presets.gilly;
 
 		function calculate_bearing(lat_1, lon_1, lat_2, lon_2){
 			return Math.atan2(
@@ -195,18 +195,6 @@ $(function() {
 					+ Math.sin(lat_1)*Math.sin(lat_2)
 			);
 		}
-
-		var start = {
-			lat: Math.radians(0),
-			lon: Math.radians(0),
-			asl: 0,
-		};
-
-		var end = {
-			lat: Math.radians(0),
-			lon: Math.radians(89),
-			asl: 0,
-		};
 
 		function get_vector_mr(mag, radians){
 			return {
@@ -231,6 +219,7 @@ $(function() {
 
 		function log_orbit(label, orbit){
 			console.log(label+": a:"+orbit.a.toFixed(2) +"m, c:"+orbit.c.toFixed(2) +"m, e:"+orbit.e.toFixed(2) +", ap:"+orbit.ap.toFixed(2)+"m");
+			console.log(label+" period: "+orbit.t+"s");
 		}
 		
 		var heading = Math.degrees(calculate_bearing(start.lat, start.lon, end.lat, end.lon));
@@ -264,7 +253,10 @@ $(function() {
 		}
 		orbit.e = orbit.c / orbit.a;
 		orbit.ap = orbit.a * (1 + orbit.e);
+		orbit.t = 6.28318 * Math.sqrt(orbit.a*orbit.a*orbit.a / body.GM);
 		log_orbit('Optimal Orbit', orbit);
+
+
 	}
 
 	function set_error(which, is_error){ // which = jquery element, is_error = true/false
@@ -293,7 +285,20 @@ $(function() {
 	// testing
 	set_error(target_position_input, true);
 	set_progress('57%');
-	calculate();
+
+	var start = {
+		lat: Math.radians(0),
+		lon: Math.radians(0),
+		asl: 0,
+	};
+
+	var end = {
+		lat: Math.radians(0),
+		lon: Math.radians(89),
+		asl: 0,
+	};
+
+	calculate(start, end);
 	set_pitch(47);
 });
 		</script>
