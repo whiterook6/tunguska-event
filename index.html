@@ -61,7 +61,6 @@
 										<option value="Ike">Ike</option>
 										<option value="Jool">Jool</option>
 										<option value="Kerbin">Kerbin</option>
-										<option value="Kerbol">Kerbol</option>
 										<option value="Laythe">Laythe</option>
 										<option value="Minmus">Minmus</option>
 										<option value="Moho">Moho</option>
@@ -160,23 +159,23 @@ $(function() {
 	var deltav_output = $('#deltav_output');
 
 	var presets = {
-		bop: {},
-		dres: {},
-		duna: {},
-		eeloo: {},
-		eve: {},
-		gilly: {},
-		ike: {},
-		jool: {},
-		kerbin: {},
-		kerbol: {},
-		laythe: {},
-		minmus: {},
-		moho: {},
+		// {G: Universal gravity, R: radius in m}
+		bop: {G: 1e10, R: 6.5e4},
+		dres: {G: 1e10, R: 1.38e5},
+		duna: {G: 1e10, R: 3.2e5},
+		eeloo: {G: 1e10, R: 2.1e5},
+		eve: {G: 1e10, R: 7e5},
+		gilly: {G: 1e10, R: 1.3e4},
+		ike: {G: 1e10, R: 1.3e5},
+		jool: {G: 1e10, R: 6e6},
+		kerbin: {G: 1e10, R: 6e5},
+		laythe: {G: 1e10, R: 5e5},
+		minmus: {G: 1e10, R: 6e4},
+		moho: {G: 1e10, R: 2.5e5},
 		mun: {G: 6.51e10, R: 2e5},
-		pol: {},
-		tylo: {},
-		vall: {},
+		pol: {G: 1e10, R: 4.4e4},
+		tylo: {G: 1e10, R: 6e5},
+		vall: {G: 1e10, R: 3e5},
 	}
 
 	function calculate(){
