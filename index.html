@@ -37,7 +37,7 @@
 								<input type="text" id="starting_position" class="form-control"/>
 							</div>
 							<div class="form-group">
-								<label for="starting_asl">Starting Altitude Above Sea Level<small>Example: 213m ASL</small></label>
+								<label for="starting_asl">Starting Altitude Above Sea Level <small>Example: 213m</small></label>
 								<input type="text" id="starting_asl" class="form-control"/>
 							</div>							
 							<div class="form-group">
@@ -45,7 +45,7 @@
 								<input type="text" id="target_position" class="form-control"/>
 							</div>
 							<div class="form-group">
-								<label for="target_asl">Target Altitude Above Sea Level<small>Example: 213m ASL</small></label>
+								<label for="target_asl">Target Altitude Above Sea Level <small>Example: 213m</small></label>
 								<input type="text" id="target_asl" class="form-control"/>
 							</div>
 							<div class="form-group">
@@ -130,6 +130,17 @@ $(function() {
 			}
 		}
 	}
+
+	// Converts from degrees to radians.
+	Math.radians = function(degrees) {
+		return degrees * Math.PI / 180;
+	};
+	 
+	// Converts from radians to degrees.
+	Math.degrees = function(radians) {
+		return radians * 180 / Math.PI;
+	};
+
 	var source_position_input = $('#starting_position');
 	source_position_input.mask(geo_mask, pattern);
 	
@@ -162,26 +173,35 @@ $(function() {
 		laythe: {},
 		minmus: {},
 		moho: {},
-		mun: {},
+		mun: {G: 6.51e10, R: 2e4},
 		pol: {},
 		tylo: {},
 		vall: {},
 	}
 
-	function get_parameters(){
-		return preset_input.val();
+	function calculate(){
+		var body = presets.mun;
+
+		function calculate_bearing(lat_1, lon_1, lat_2, lon_2){
+			return Math.atan2(
+				Math.cos(lat_1)*Math.sin(lat_2) - Math.sin(lat_1)*Math.cos(lat_2)*Math.cos(lon_2 - lon_1),
+				Math.sin(lon_2 - lon_1)*Math.cos(lat_2)
+			);
+		}
+
+		var lat_1 = Math.radians(50.0);
+		var lon_1 = Math.radians(-123.45);
+
+		var lat_2 = Math.radians(70.0);
+		var lon_2 = Math.radians(-43.45);
+		set_heading(Math.degrees(calculate_bearing(lat_1, lon_1, lat_2, lon_2)));
 	}
 
-	function get_start_pos(){
-		var value = source_position_input.val();
-
-	}
-
-	function set_error(is_error){
+	function set_error(which, is_error){ // which = jquery element, is_error = true/false
 		if (is_error){
-			form.addClass('has-error').removeClass('has-success');
+			which.addClass('has-error').removeClass('has-success');
 		} else {
-			form.addClass('has-success').removeClass('has-error');
+			which.addClass('has-success').removeClass('has-error');
 		}
 	}
 
@@ -190,17 +210,17 @@ $(function() {
 	}
 
 	function set_heading(heading){
-		heading_output.val(heading + "° east from North");
+		heading_output.val(heading.toFixed(1) + "° east from North");
 	}
 
 	function set_pitch(pitch){
-		pitch_output.val(pitch + "° above the horizon");
+		pitch_output.val(pitch.toFixed(1) + "° above the horizon");
 	}
 
 	// testing
-	set_error(true);
+	set_error(target_position_input, true);
 	set_progress('57%');
-	set_heading(123);
+	calculate();
 	set_pitch(47);
 });
 		</script>
