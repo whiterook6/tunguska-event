@@ -18,7 +18,7 @@ $(function() {
 	var source_position_input = $('#starting_position');
 	var source_asl_input = $('#starting_asl');
 	var target_position_input = $('#target_position');
-	var target_asl_input = $('#starting_asl');
+	var target_asl_input = $('#target_asl');
 	var preset_input = $('#body_select');
 	
 	var submit_button = $('#submit');
@@ -122,9 +122,9 @@ $(function() {
 		};
 	}
 
-	function calculate_optimal_orbit(start, end, body){		
+	function calculate_optimal_orbit(start, end, body){
 		var theta = calculate_theta(start.lat, start.lon, end.lat, end.lon);
-		console.log("Theta: "+theta.toFixed(4)+"r");
+		console.log("B9 (Theta): "+theta.toFixed(4)+"r");
 
 		var min_mag = Math.min(start.asl + body.R, end.asl + body.R);
 		var Ra = get_vector_mr(min_mag, theta);
@@ -221,11 +221,21 @@ $(function() {
 		var pitch;
 		var deltav;
 
+		var body = presets[preset_input.val()];
 		var start = parse_coordinates(source_position_input);
 		start.asl = parse_asl(source_asl_input);
+		console.log('B1: '+Math.radians(start.lat));
+		console.log('B2: '+Math.radians(start.lon));
+		console.log('lon_1: '+(start.asl+body.R));
 
 		var end = parse_coordinates(target_position_input);
 		end.asl = parse_asl(target_asl_input);
+		console.log('B4: '+Math.radians(end.lat));
+		console.log('B5: '+Math.radians(end.lon));
+		console.log('B6: '+(end.asl+body.R));
+
+		console.log('H2: '+body.GM);
+		console.log('H3: '+body.R);
 
 		var new_end = {
 			lat: end.lat,
@@ -233,11 +243,10 @@ $(function() {
 			asl: end.asl
 		};
 
-		var body = presets[preset_input.val()];
 		var orbit = calculate_optimal_orbit(start, new_end, body);
 		log_orbit('Initial Orbit', orbit);
 
-		for (var i = 0; i < 5; i++) {
+		for (var i = 0; i < 0; i++) {
 
 			// calculate how far the target travels over time and compensate
 			var true_anomaly = calculate_true_anomaly(orbit, start, new_end);
