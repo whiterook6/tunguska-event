@@ -192,7 +192,7 @@ $(function() {
 	function calculate_time_from_periapsis(orbit, true_anomaly){
 		var eccentric_anomaly = Math.acos((orbit.e + Math.cos(true_anomaly)) / (1 + orbit.e*Math.cos(true_anomaly)));
 		
-		if (true_anomaly < 3.14159){
+		if (true_anomaly > 3.14159){
 			eccentric_anomaly = 6.28318 - eccentric_anomaly;
 		}
 
