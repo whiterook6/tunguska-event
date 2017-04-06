@@ -52,28 +52,28 @@
 								<label for="body_select" class="control-label">Body</label>
 								<select class="form-control" id="body_select">
 									<optgroup label="Stock System">
-										<option value="Bop">Bop</option>
-										<option value="Dres">Dres</option>
-										<option value="Duna">Duna</option>
-										<option value="Eeloo">Eeloo</option>
-										<option value="Eve">Eve</option>
-										<option value="Gilly">Gilly</option>
-										<option value="Ike">Ike</option>
-										<option value="Jool">Jool</option>
-										<option value="Kerbin">Kerbin</option>
-										<option value="Laythe">Laythe</option>
-										<option value="Minmus">Minmus</option>
-										<option value="Moho">Moho</option>
-										<option value="Mun">Mun</option>
-										<option value="Pol">Pol</option>
-										<option value="Tylo">Tylo</option>
-										<option value="Vall">Vall</option>
+										<option value="bop">Bop</option>
+										<option value="dres">Dres</option>
+										<option value="duna">Duna</option>
+										<option value="eeloo">Eeloo</option>
+										<option value="eve">Eve</option>
+										<option value="gilly">Gilly</option>
+										<option value="ike">Ike</option>
+										<option value="jool">Jool</option>
+										<option value="kerbin">Kerbin</option>
+										<option value="laythe">Laythe</option>
+										<option value="minmus">Minmus</option>
+										<option value="moho">Moho</option>
+										<option value="mun">Mun</option>
+										<option value="pol">Pol</option>
+										<option value="tylo">Tylo</option>
+										<option value="vall">Vall</option>
  									</optgroup>
 								</select>
 							</div>
 							<div class="btn-group">
-								<button type="button" class="btn btn-default">Reset</button>
-								<button type="button" class="btn btn-success">Calculate</button>
+								<button type="button" id="reset" class="btn btn-default">Reset</button>
+								<button type="button" id="submit" class="btn btn-success">Calculate</button>
 							</div>
 
 							<div class="progress" style="margin-top:15px;margin-bottom:0">
@@ -89,16 +89,16 @@
 						</div>
 						<form class="panel-body">
 							<div class="form-group">
-								<label for="starting_position" class="control-label">Heading (degrees)</label>
-								<input type="text" id="heading_output" class="form-control" disabled value="47&deg; east from North" />
+								<label for="starting_position" class="control-label">Heading (degrees clockwise from North)</label>
+								<input type="text" id="heading_output" class="form-control" disabled />
 							</div>
 							<div class="form-group">
 								<label for="target_position" class="control-label">Pitch (degrees)</label>
-								<input type="text" id="pitch_output" class="form-control" disabled value="37&deg; above the horizon" />
+								<input type="text" id="pitch_output" class="form-control" disabled />
 							</div>
 							<div class="form-group">
 								<label for="target_position" class="control-label">Delta-V Required</label>
-								<input type="text" id="deltav_output" class="form-control" disabled value="1.56km/s" />
+								<input type="text" id="deltav_output" class="form-control" disabled />
 							</div>
 						</form>
 					</div>
