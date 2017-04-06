@@ -72,8 +72,8 @@ $(function() {
 		var match = geo_regex.exec(start);
 		
 		return {
-			lat: parseFloat(match[1]),
-			lon: parseFloat(match[2])
+			lat: Math.radians(parseFloat(match[1])),
+			lon: Math.radians(parseFloat(match[2]))
 		};
 	}
 
@@ -224,18 +224,9 @@ $(function() {
 		var body = presets[preset_input.val()];
 		var start = parse_coordinates(source_position_input);
 		start.asl = parse_asl(source_asl_input);
-		console.log('B1: '+Math.radians(start.lat));
-		console.log('B2: '+Math.radians(start.lon));
-		console.log('lon_1: '+(start.asl+body.R));
 
 		var end = parse_coordinates(target_position_input);
 		end.asl = parse_asl(target_asl_input);
-		console.log('B4: '+Math.radians(end.lat));
-		console.log('B5: '+Math.radians(end.lon));
-		console.log('B6: '+(end.asl+body.R));
-
-		console.log('H2: '+body.GM);
-		console.log('H3: '+body.R);
 
 		var new_end = {
 			lat: end.lat,
@@ -246,7 +237,7 @@ $(function() {
 		var orbit = calculate_optimal_orbit(start, new_end, body);
 		log_orbit('Initial Orbit', orbit);
 
-		for (var i = 0; i < 0; i++) {
+		for (var i = 0; i < 5; i++) {
 
 			// calculate how far the target travels over time and compensate
 			var true_anomaly = calculate_true_anomaly(orbit, start, new_end);
@@ -261,6 +252,7 @@ $(function() {
 				lon: end.lon + rotation,
 				asl: end.asl
 			};
+			log_coordinates(new_end);
 			orbit = calculate_optimal_orbit(start, new_end, body);
 		}
 
