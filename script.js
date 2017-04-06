@@ -3,19 +3,6 @@ $(function() {
 
 	var progress_bar = $('#progress_bar');
 
-	var geo_mask = "S0D.0000 N, S0DD.0000 W";
-	var pattern = {
-		translation: {
-			'S': { // sign
-				pattern: /\-?/
-			},
-			'D': { // optional digit
-				pattern: /\d/,
-				optional: true
-			}
-		}
-	};
-
 	// Converts from degrees to radians.
 	Math.radians = function(degrees) {
 		return degrees * Math.PI / 180;
@@ -27,16 +14,10 @@ $(function() {
 	};
 
 	var source_position_input = $('#starting_position');
-	source_position_input.mask(geo_mask, pattern);
-	
 	var source_asl = $('#starting_asl');
-	source_asl.mask('0DDDm', pattern);
 
 	var target_position_input = $('#target_position');
-	target_position_input.mask(geo_mask, pattern);
-
 	var target_asl = $('#starting_asl');
-	target_asl.mask('0DDDm', pattern);
 
 	var preset_input = $('#body_select');
 
