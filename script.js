@@ -62,7 +62,7 @@ $(function() {
 	}
 
 	function log_coordinates(label, coordinates){
-		console.log(label+": lat: "+coordinates.lat+" lon: "+coordinates.lon+" at "+coordinates.asl+"m from sea level.");
+		console.log(label+": lat: "+Math.degrees(coordinates.lat)+" lon: "+Math.degrees(coordinates.lon)+" at "+coordinates.asl+"m from sea level.");
 	}
 
 	// reading input
@@ -208,8 +208,8 @@ $(function() {
 		}
 	}
 
-	function calculate_body_rotation(body, t){ // returns in degrees to add to target longitude
-		return (t / body.t) * 360;
+	function calculate_body_rotation(body, t){ // returns in radians
+		return (t / body.t) * 6.28318;
 	}
 
 	function calculate_pitch(orbit, true_anomaly){
@@ -252,7 +252,7 @@ $(function() {
 				lon: end.lon + rotation,
 				asl: end.asl
 			};
-			log_coordinates(new_end);
+			log_coordinates('New end', new_end);
 			orbit = calculate_optimal_orbit(start, new_end, body);
 		}
 
