@@ -247,11 +247,7 @@ $(function() {
 			console.log('Flight time: '+flight_time+'s');
 			var rotation = calculate_body_rotation(body, flight_time);
 
-			new_end = {
-				lat: end.lat,
-				lon: end.lon + rotation,
-				asl: end.asl
-			};
+			new_end.lon = end.lon + rotation;
 			log_coordinates('New end', new_end);
 			orbit = calculate_optimal_orbit(start, new_end, body);
 		}
@@ -274,24 +270,24 @@ $(function() {
 
 		var suffix;
 		if (heading < 22.5 || heading > 337.5){
-			suffix = " (mostly north)";
+			suffix = "° (mostly north)";
 		} else if (heading < 67.5){
-			suffix = " (mostly northeast)";
+			suffix = "° (mostly northeast)";
 		} else if (heading < 112.5){
-			suffix = " (mostly east)";
+			suffix = "° (mostly east)";
 		} else if (heading < 157.5){
-			suffix = " (mostly southeast)";
+			suffix = "° (mostly southeast)";
 		} else if (heading < 202.5){
-			suffix = " (mostly south)";
+			suffix = "° (mostly south)";
 		} else if (heading < 247.5){
-			suffix = " (mostly southwest)";
+			suffix = "° (mostly southwest)";
 		} else if (heading < 292.5){
-			suffix = " (mostly west)";
+			suffix = "° (mostly west)";
 		} else {
-			suffix = " (mostly northwest)";
+			suffix = "° (mostly northwest)";
 		}
 
-		heading_output.val(heading.toFixed(1) + "° east from North"+suffix);
+		heading_output.val(heading.toFixed(1) + suffix);
 	}
 
 	function set_pitch(pitch){
