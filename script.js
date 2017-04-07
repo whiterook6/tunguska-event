@@ -137,24 +137,19 @@ $(function() {
 
 	function calculate_optimal_orbit(start, end, body){
 		var theta = calculate_theta(start.lat, start.lon, end.lat, end.lon);
-		console.log("B9 (Theta): "+theta.toFixed(4)+"r");
 
 		var min_mag = Math.min(start.asl + body.R, end.asl + body.R);
 		var Ra = get_vector_mr(min_mag, theta);
-		log_vector('Ra', Ra);
 
 		var max_mag = Math.max(start.asl + body.R, end.asl + body.R);
 		var Rb = get_vector_xy(max_mag, 0); // manually set to find the x-origin or some shit
-		log_vector('Rb', Rb);
 
 		var Rc = get_vector_xy(Rb.x - Ra.x, Rb.y - Ra.y);
-		log_vector('Rc', Rc);
 
 		var Rf = get_vector_xy(
 			Rb.x - 0.5*(Rc.x/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag), // x
 			Rb.y - 0.5*(Rc.y/Rc.mag)*(Rc.mag - Rb.mag + Ra.mag) // y
 		);
-		log_vector('Rf', Rf);
 
 		var orbit = {
 			a:  0.5 * (Rb.mag + 0.5*(Rc.mag - Rb.mag + Ra.mag)),
@@ -239,7 +234,6 @@ $(function() {
 		};
 
 		var orbit = calculate_optimal_orbit(start, new_end, body);
-		log_orbit('Initial Orbit', orbit);
 
 		for (var i = 0; i < 0; i++) {
 
@@ -251,7 +245,6 @@ $(function() {
 			var rotation = calculate_body_rotation(body, flight_time);
 
 			new_end.lon = end.lon + rotation;
-			log_coordinates('New end', new_end);
 			orbit = calculate_optimal_orbit(start, new_end, body);
 		}
 
