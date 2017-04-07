@@ -22,13 +22,12 @@ $(function() {
 	var preset_input = $('#body_select');
 	
 	var submit_button = $('#submit');
-	var reset_button = $('#reset');
-	var progress_bar = $('#progress_bar');
 
 	var heading_output = $('#heading_output');
 	var pitch_output = $('#pitch_output');
 	var deltav_output = $('#deltav_output');
 	var v_liftoff_output = $('#v_liftoff_output');
+	var v_impact_output = $('#v_impact_output');
 
 	// static data
 	var presets = {
@@ -235,7 +234,7 @@ $(function() {
 
 		var orbit = calculate_optimal_orbit(start, new_end, body);
 
-		for (var i = 0; i < 0; i++) {
+		for (var i = 0; i < 4; i++) {
 
 			// calculate how far the target travels over time and compensate
 			var true_anomaly = calculate_true_anomaly(orbit, start, new_end);
@@ -262,15 +261,13 @@ $(function() {
 		));
 
 		var v_liftoff = calculate_deltav(orbit, start, body);
-		var v_landing = calculate_deltav(orbit, new_end, body);
-		var total_delta_v = v_liftoff + v_landing;
-
-		set_deltav(total_delta_v);
 		set_v_liftoff(v_liftoff);
-	}
 
-	function set_progress(complete){
-		progress_bar.width(complete);
+		var v_impact = calculate_deltav(orbit, new_end, body);
+		set_v_impact(v_impact);
+
+		var total_delta_v = v_liftoff + v_impact;
+		set_deltav(total_delta_v);
 	}
 
 	function set_heading(heading){
@@ -304,20 +301,24 @@ $(function() {
 		pitch_output.val(Math.degrees(pitch).toFixed(1) + "° above the horizon");
 	}
 
-	function set_v_liftoff(v_liftoff){
-		if (v_liftoff < 900){
-			v_liftoff_output.val(v_liftoff.toFixed(2)+"m/s");
+	function format_deltav(deltav){
+		if (deltav < 900){
+			return deltav.toFixed(2)+"m/s";
 		} else {
-			v_liftoff_output.val((v_liftoff/1000).toFixed(3)+"km/s");
+			return (deltav/1000).toFixed(3)+"km/s";
 		}
 	}
 
+	function set_v_liftoff(v_liftoff){
+		v_liftoff_output.val(format_deltav(v_liftoff));
+	}
+
+	function set_v_impact(v_impact){
+		v_impact_output.val(format_deltav(v_impact));
+	}
+
 	function set_deltav(deltav){
-		if (deltav < 900){
-			deltav_output.val(deltav.toFixed(2)+"m/s");
-		} else {
-			deltav_output.val((deltav/1000).toFixed(3)+"km/s");
-		}
+		deltav_output.val(format_deltav(deltav));
 	}
 
 	// controls
