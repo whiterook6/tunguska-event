@@ -99,8 +99,9 @@ $(function() {
 	// calculations ... urgh
 	function calculate_bearing(lat_1, lon_1, lat_2, lon_2){
 		return Math.atan2(
-			Math.cos(lat_1)*Math.sin(lat_2) - Math.sin(lat_1)*Math.cos(lat_2)*Math.cos(lon_2 - lon_1),
-			Math.sin(lon_2 - lon_1)*Math.cos(lat_2)
+			Math.sin(lon_2 - lon_1)*Math.cos(lat_2),
+			Math.cos(lat_1)*Math.sin(lat_2) - Math.sin(lat_1)*Math.cos(lat_2)*Math.cos(lon_2 - lon_1)
+			
 		);
 	}
 
@@ -243,7 +244,7 @@ $(function() {
 		var orbit = calculate_optimal_orbit(start, new_end, body);
 		log_orbit('Initial Orbit', orbit);
 
-		for (var i = 0; i < 5; i++) {
+		for (var i = 0; i < 0; i++) {
 
 			// calculate how far the target travels over time and compensate
 			var true_anomaly = calculate_true_anomaly(orbit, start, new_end);
