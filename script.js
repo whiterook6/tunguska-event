@@ -67,13 +67,24 @@ $(function() {
 
 	// reading input
 	function parse_coordinates(input){
-		var geo_regex = /(\-?\d+\.\d+).*N, (\-?\d+\.\d+).*W/;
+		var geo_regex = /(\-?\d+\.\d+).*([NS]), (\-?\d+\.\d+).*([WE])/;
 		var start = input.val();
 		var match = geo_regex.exec(start);
+
+		var lat = Math.radians(parseFloat(match[1]));
+		var lon = Math.radians(parseFloat(match[3]));
+
+		if (match[2] == 'S'){ // flip
+			lat = -lat;
+		}
+
+		if (match[4] == 'W'){
+			lon = -lon;
+		}
 		
 		return {
-			lat: Math.radians(parseFloat(match[1])),
-			lon: Math.radians(parseFloat(match[2]))
+			lat: lat,
+			lon: lon,
 		};
 	}
 
@@ -162,12 +173,7 @@ $(function() {
 
 	function calculate_deltav(orbit, start, end, body){
 		var altitude_1 = start.asl + body.R;
-		var v1 = Math.sqrt(body.GM * ((2/altitude_1) - (1/orbit.a)));
-
-		var altitude_2 = end.asl + body.R;
-		var v2 = Math.sqrt(body.GM * ((2/altitude_2) - (1/orbit.a)));
-
-		return v1 + v1;
+		return Math.sqrt(body.GM * ((2/altitude_1) - (1/orbit.a)));
 	}
 
 	function calculate_true_anomaly(orbit, start, end){
