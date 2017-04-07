@@ -28,6 +28,7 @@ $(function() {
 	var heading_output = $('#heading_output');
 	var pitch_output = $('#pitch_output');
 	var deltav_output = $('#deltav_output');
+	var v_liftoff_output = $('#v_liftoff_output');
 
 	// static data
 	var presets = {
@@ -172,12 +173,13 @@ $(function() {
 		return orbit;
 	}
 
-	function calculate_deltav(orbit, start, end, body){
-		var altitude_1 = start.asl + body.R;
-		return Math.sqrt(body.GM * ((2/altitude_1) - (1/orbit.a)));
+	function calculate_deltav(orbit, start, body){
+		var altitude = start.asl + body.R;
+		return Math.sqrt(body.GM * ((2/altitude) - (1/orbit.a)));
 	}
 
 	function calculate_true_anomaly(orbit, start, end){
+		// if(C4>C7, pi()-acos((C16*C14+D16*D14)/(E16*E14)), pi()-acos((C16*C13+D16*D13)/(E16*E13)))
 		if (start.asl > end.asl){
 			return 3.14159 - Math.acos(
 				(orbit.Rf.x*orbit.Rb.x + orbit.Rf.y*orbit.Rb.y) / (orbit.Rf.mag*orbit.Rb.mag)
@@ -188,13 +190,6 @@ $(function() {
 			);
 		}
 	}
-
-	function calculate_flight_path(orbit, true_anomaly){
-		return Math.atan(
-			(orbit.e*Math.sin(true_anomaly)) / (1 + orbit.e*Math.cos(true_anomaly))
-		);
-	}
-
 
 	function calculate_time_from_periapsis(orbit, true_anomaly){
 		var eccentric_anomaly = Math.acos((orbit.e + Math.cos(true_anomaly)) / (1 + orbit.e*Math.cos(true_anomaly)));
@@ -220,7 +215,9 @@ $(function() {
 	}
 
 	function calculate_pitch(orbit, true_anomaly){
-		return Math.atan(orbit.e * true_anomaly / (1 + orbit.e*true_anomaly));
+		return Math.atan(
+			(orbit.e*Math.sin(true_anomaly)) / (1.0 + orbit.e*Math.cos(true_anomaly))
+		);
 	}
 
 	function run_calculations(){
@@ -251,7 +248,6 @@ $(function() {
 			var time_at_launch = calculate_time_from_periapsis(orbit, true_anomaly);
 			var time_at_landing = calculate_time_from_periapsis(orbit, true_anomaly + orbit.theta);
 			var flight_time = calculate_flight_time(time_at_launch, time_at_landing, orbit);
-			console.log('Flight time: '+flight_time+'s');
 			var rotation = calculate_body_rotation(body, flight_time);
 
 			new_end.lon = end.lon + rotation;
@@ -259,11 +255,25 @@ $(function() {
 			orbit = calculate_optimal_orbit(start, new_end, body);
 		}
 
-		log_orbit('Final Orbit', orbit);
-		set_heading(calculate_heading(start, new_end));
+		set_heading(calculate_heading(
+			start,
+			new_end
+		));
+		set_pitch(calculate_pitch(
+			orbit,
+			calculate_true_anomaly(
+				orbit,
+				start,
+				new_end
+			)
+		));
 
-		set_pitch(calculate_pitch(orbit, calculate_true_anomaly(orbit, start, new_end)));
-		set_deltav(calculate_deltav(orbit, start, new_end, body));
+		var v_liftoff = calculate_deltav(orbit, start, body);
+		var v_landing = calculate_deltav(orbit, new_end, body);
+		var total_delta_v = v_liftoff + v_landing;
+
+		set_deltav(total_delta_v);
+		set_v_liftoff(v_liftoff);
 	}
 
 	function set_progress(complete){
@@ -299,6 +309,14 @@ $(function() {
 
 	function set_pitch(pitch){
 		pitch_output.val(Math.degrees(pitch).toFixed(1) + "° above the horizon");
+	}
+
+	function set_v_liftoff(v_liftoff){
+		if (v_liftoff < 900){
+			v_liftoff_output.val(v_liftoff.toFixed(2)+"m/s");
+		} else {
+			v_liftoff_output.val((v_liftoff/1000).toFixed(3)+"km/s");
+		}
 	}
 
 	function set_deltav(deltav){
